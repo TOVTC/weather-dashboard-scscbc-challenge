@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1 class="text-center">Weather Dashboard</h1>
+    </header>
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-3">
+                    <div class="card">
+                        <h2 class="card-title">Search for a City:</h2>
+                        <form class="card-text">
+                            <input input type="text" placeholder="San Diego" name="city" class="form-control form-control-lg">
+                        </form>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-block">Search</button>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-secondary btn-block">Austin</button>
+                        <button type="button" class="btn btn-secondary btn-block">Chicago</button>
+                        <button type="button" class="btn btn-secondary btn-block">New York</button>
+                        <button type="button" class="btn btn-secondary btn-block">Orlando</button>
+                        <button type="button" class="btn btn-secondary btn-block">San Francisco</button>
+                        <button type="button" class="btn btn-secondary btn-block">Seattle</button>
+                        <button type="button" class="btn btn-secondary btn-block">Denver</button>
+                        <button type="button" class="btn btn-secondary btn-block">Atlanta</button>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <h2>Atlanta (3/30/2021)</h2>
+                    <ul>
+                        <li>Temp</li>
+                        <li>Wind</li>
+                        <li>Humidity</li>
+                        <li>UV</li>
+                    </ul>
+                    <div>
+                        <h3>5-Day Forecast:</h3>
+                        <div class="card">this is a card</div>
+                        <div class="card">this is a card</div>
+                        <div class="card">this is a card</div>
+                        <div class="card">this is a card</div>
+                        <div class="card">this is a card</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="./assets/js/script.js"></script>
+</body>
+</html>
