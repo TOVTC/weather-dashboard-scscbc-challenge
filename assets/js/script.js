@@ -76,9 +76,9 @@ var getWeather = function(data) {
                 var currentTitleEl = document.createElement("h2");
                 currentTitleEl.className = "card-title";
                 currentTitleEl.textContent = data[0].name + " " + formatDate + " ";
-                var weatherIcon = document.createElement("img")
-                weatherIcon.src = "http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png"
-                weatherIcon.alt = "weather icon"
+                var weatherIcon = document.createElement("img");
+                weatherIcon.src = "http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png";
+                weatherIcon.alt = "weather icon";
                 currentTitleEl.appendChild(weatherIcon);
                 currentWeatherEl.appendChild(currentTitleEl);
                 //search for repeats, handle history buttons, load current weather, load weather forecast
@@ -124,7 +124,7 @@ var dynamicHistory = function(cityName) {
         searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
     }
     //limit update localStorage, but limit its length to 7 values - the eighth value is current location, create button
-    if (savedHistory.length === 7) {
+    if (savedHistory.length === 8) {
         savedHistory.shift();
         savedHistory.push(cityName);
         localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
@@ -172,7 +172,16 @@ var currentWeather = function(response) {
     createCurrentLiEl("Temp: " + response.current.temp + "°C");
     createCurrentLiEl("Wind: " + response.current.wind_speed + " MPS");
     createCurrentLiEl("Humidity: " + response.current.humidity + "%");
-    createCurrentLiEl("UV Index: " + response.current.uvi);
+    var listEl = document.createElement("li");
+    listEl.textContent = "UV Index: " + response.current.uvi;
+    if (response.current.uvi < 2) {
+        listEl.className = "list-group-item green";
+    } else if (response.current.uvi < 7) {
+        listEl.className = "list-group-item yellow";
+    } else if (response.current.uvi > 7) {
+        listEl.className = "list-group-item red";
+    }
+    currentConditionsEl.appendChild(listEl);
 }
 
 //load weather forecast
@@ -202,9 +211,9 @@ var forecastWeather = function(response) {
         //add weather icon
         var listEl = document.createElement("li");
         listEl.className = "list-group-item";
-        var weatherIcon = document.createElement("img")
-        weatherIcon.src = "http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png"
-        weatherIcon.alt = "weather icon"
+        var weatherIcon = document.createElement("img");
+        weatherIcon.src = "http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png";
+        weatherIcon.alt = "weather icon";
         listEl.appendChild(weatherIcon);
         forecastConditions.appendChild(listEl);
         //create remaining weather elements
