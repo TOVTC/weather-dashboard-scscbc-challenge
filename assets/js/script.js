@@ -18,6 +18,10 @@
 //https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid=6b2366660c4d73ceba774993533fef58
 //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=6b2366660c4d73ceba774993533fef58
 
+var currentTitleEl = document.querySelector("#current-title");
+var currentWeatherEl = document.querySelector("#current-weather");
+var forecastWeatherEl = document.querySelector("#forecast-weather")
+
 //geolocation API request
 var apiLatLon = function() {
     var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=toronto&appid=6b2366660c4d73ceba774993533fef58"; //don't forget to make city dynamic for user input
@@ -26,7 +30,6 @@ var apiLatLon = function() {
             response.json().then(function(data) {
                 console.log(data[0].lat, data[0].lon)
                 getWeather(data);
-                //also write a line of code to change the text of the heading to the name of the city
             })
         })
 }
@@ -37,6 +40,10 @@ var getWeather = function(data) {
     fetch(apiUrl).then(function(response) {
         // console.log(response.json())
         response.json().then(function(response) {
+            var currentTitleEl = document.createElement("h2");
+            currentTitleEl.className = "card-title";
+            currentTitleEl.textContent = data[0].name + " " + response.current.dt + " " + response.current.weather[0].icon;
+            currentWeatherEl.appendChild(currentTitleEl);
             //call two separate functions - one for current and one for future
             currentWeather(response);
             forecastWeather(response);
@@ -45,22 +52,44 @@ var getWeather = function(data) {
 }
 
 var currentWeather = function(response) {
-    console.log(response.current.dt)
-    console.log(response.current.weather[0].icon);
-    console.log(response.current.temp);
-    console.log(response.current.wind_speed);
-    console.log(response.current.humidity);
-    console.log(response.current.uvi);
+    var currentConditionsEl = document.createElement("ul");
+    currentConditionsEl.className = "card-text list-group list-group-flush";
+    currentWeatherEl.appendChild(currentConditionsEl);
+    //create any button in the quiz element
+    var createCurrentLiEl = function(condition){
+        var listEl = document.createElement("li")
+        listEl.textContent = condition;
+        listEl.className = "list-group-item";
+        currentConditionsEl.appendChild(listEl);
+    }
+    createCurrentLiEl("Temp: " + response.current.temp + "°C");
+    createCurrentLiEl("Wind: " + response.current.wind_speed + " MPS");
+    createCurrentLiEl("Humidity: " + response.current.humidity + "%");
+    createCurrentLiEl("UV Index: " + response.current.uvi);
 }
 
 var forecastWeather = function(response) {
     for (i = 0; i < 5; i++) {
-        console.log("***");
-        console.log(response.daily[i].dt);
-        console.log(response.daily[i].weather[0].icon);
-        console.log(response.daily[i].temp.day);
-        console.log(response.daily[i].wind_speed);
-        console.log(response.daily[i].humidity);
+        var cardEl = document.createElement("div");
+        cardEl.className = "card";
+        forecastWeatherEl.appendChild(cardEl);
+        var forecastTitle = document.createElement("h4")
+        forecastTitle.className = "card-title"
+        forecastTitle.textContent = response.daily[i].dt;
+        cardEl.appendChild(forecastTitle);
+        var forecastConditions = document.createElement("ul")
+        forecastConditions.className = "list-group list-group-flush card-text"
+        cardEl.appendChild(forecastConditions);
+        var createForecastLiEl = function(condition){
+            var listEl = document.createElement("li")
+            listEl.textContent = condition;
+            listEl.className = "list-group-item";
+            forecastConditions.appendChild(listEl);
+        }
+        createForecastLiEl(response.daily[i].weather[0].icon);
+        createForecastLiEl("Temp: " + response.daily[i].temp.day + "°C");
+        createForecastLiEl("Wind: " + response.daily[i].wind_speed + " MPS");
+        createForecastLiEl("Humidity: " + response.daily[i].humidity + "%");
     }
 }
 
