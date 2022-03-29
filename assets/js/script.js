@@ -1,4 +1,3 @@
-//set up buttons for search history using data-* property
 //set up function to choose from a list of icons depending on the type of weather returned
 //add momentJS to format dates
 //add finishing touches with Bootstrap/custom CSS
@@ -18,13 +17,27 @@ var citySubmitHandler = function(event) {
     //trim input and send to geolocation API to get lat and lon values
     var cityName = selectedCityEl.value.trim();
     if (selectedCityEl.value) {
-        //reset divs on screen
+        //reset divs
         selectedCityEl.value = "";
         currentWeatherEl.innerHTML = "";
         forecastWeatherEl.innerHTML = "";
         getLatLon(cityName);
     } else {
         alert("Error: You need to enter a city");
+        return;
+    }
+}
+
+//button for saved city clicked
+var clickHandler = function(event) {
+    if (event.target.className === "btn btn-secondary btn-block") {
+        //reset divs 
+        currentWeatherEl.innerHTML = "";
+        forecastWeatherEl.innerHTML = "";
+        //get data attribute, set as cityName
+        var cityName = event.target.getAttribute("data-city");
+        getLatLon(cityName);
+    } else {
         return;
     }
 }
@@ -36,6 +49,7 @@ var getLatLon = function(cityName) {
         .then(function(response) {
             if (response.ok) {
                 response.json().then(function(data) {
+                    //if invalid string of text entered, API status is still 200, but with empty array of data, so check length of array returned
                     if (data.length !== 0) {
                         getWeather(data);
                     } else {
@@ -77,8 +91,6 @@ var getWeather = function(data) {
     });
 }
 
-//set data attribute to be the text content of the button
-
 //search for repeats in search history
 var searchRepeats = function(cityName) {
     var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
@@ -94,6 +106,7 @@ var searchRepeats = function(cityName) {
     localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
 }
 
+//handles button creation and localStorage updates - avoids repeats and sets a max length for search history
 var dynamicHistory = function(cityName) {
     var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
     //function to create buttons
@@ -101,6 +114,7 @@ var dynamicHistory = function(cityName) {
         var buttonEl = document.createElement("button");
         buttonEl.textContent = cityName;
         buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.setAttribute("data-city", cityName);
         buttonEl.setAttribute("id", cityName.split(" ").join(""));
         searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
     }
@@ -131,6 +145,7 @@ var loadHistory = function() {
         var buttonEl = document.createElement("button");
         buttonEl.textContent = savedHistory[i];
         buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.setAttribute("data-city", savedHistory[i]);
         buttonEl.setAttribute("id", savedHistory[i].split(" ").join(""));
         searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
     }
@@ -187,6 +202,7 @@ var forecastWeather = function(response) {
 
 searchFormEl.addEventListener("submit", citySubmitHandler);
 submitButtonEl.addEventListener("click", citySubmitHandler);
+searchHistoryEl.addEventListener("click", clickHandler);
 
 loadHistory();
 getLatLon("Toronto");
