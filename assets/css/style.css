@@ -1,0 +1,45 @@
+header {
+    height: 100px;
+    background: linear-gradient(90deg, rgb(112, 172, 197) 0%, rgb(34, 82, 128) 60%);
+    color: rgb(255, 255, 255);
+}
+
+.green {
+    background: rgb(0, 128, 0);
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+.yellow {
+    background: rgb(255, 255, 0);
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+.red {
+    background: rgb(255, 0, 0);
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+.divider {
+    border-top: 2px solid rgb(128, 128, 128);
+}
+
+.sizing {
+    max-width: 225px;
+    min-width: 175px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.font-size {
+    font-size: 18px;
+}
+
+.card-style {
+    color: rgb(255, 255, 255);
+    background: rgb(112, 172, 197);
+}
