@@ -72,9 +72,14 @@ var getWeather = function(data) {
         if (response.ok) {
             response.json().then(function(response) {
                 //add header text
+                var formatDate = moment.unix(response.current.dt).format("(YYYY/MM/DD)");
                 var currentTitleEl = document.createElement("h2");
                 currentTitleEl.className = "card-title";
-                currentTitleEl.textContent = data[0].name + " " + response.current.dt + " " + response.current.weather[0].icon;
+                currentTitleEl.textContent = data[0].name + " " + formatDate + " ";
+                var weatherIcon = document.createElement("img")
+                weatherIcon.src = "http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png"
+                weatherIcon.alt = "weather icon"
+                currentTitleEl.appendChild(weatherIcon);
                 currentWeatherEl.appendChild(currentTitleEl);
                 //search for repeats, handle history buttons, load current weather, load weather forecast
                 searchRepeats(data[0].name);
@@ -179,8 +184,9 @@ var forecastWeather = function(response) {
         forecastWeatherEl.appendChild(cardEl);
         //add date title to each card
         var forecastTitle = document.createElement("h4");
+        var formatDate = moment.unix(response.daily[i].dt).format("YYYY/MM/DD");
         forecastTitle.className = "card-title";
-        forecastTitle.textContent = response.daily[i].dt;
+        forecastTitle.textContent = formatDate;
         cardEl.appendChild(forecastTitle);
         //create a ul element to hold weather conditions
         var forecastConditions = document.createElement("ul");
@@ -193,7 +199,15 @@ var forecastWeather = function(response) {
             listEl.className = "list-group-item";
             forecastConditions.appendChild(listEl);
         }
-        createForecastLiEl(response.daily[i].weather[0].icon);
+        //add weather icon
+        var listEl = document.createElement("li");
+        listEl.className = "list-group-item";
+        var weatherIcon = document.createElement("img")
+        weatherIcon.src = "http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png"
+        weatherIcon.alt = "weather icon"
+        listEl.appendChild(weatherIcon);
+        forecastConditions.appendChild(listEl);
+        //create remaining weather elements
         createForecastLiEl("Temp: " + response.daily[i].temp.day + "°C");
         createForecastLiEl("Wind: " + response.daily[i].wind_speed + " MPS");
         createForecastLiEl("Humidity: " + response.daily[i].humidity + "%");
