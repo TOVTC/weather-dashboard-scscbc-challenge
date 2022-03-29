@@ -30,7 +30,7 @@ var citySubmitHandler = function(event) {
 
 //button for saved city clicked
 var clickHandler = function(event) {
-    if (event.target.className === "btn btn-secondary btn-block") {
+    if (event.target.className === "btn btn-secondary btn-block btn-lg my-3") {
         //reset divs 
         currentWeatherEl.innerHTML = "";
         forecastWeatherEl.innerHTML = "";
@@ -74,7 +74,7 @@ var getWeather = function(data) {
                 //add header text
                 var formatDate = moment.unix(response.current.dt).format("(YYYY/MM/DD)");
                 var currentTitleEl = document.createElement("h2");
-                currentTitleEl.className = "card-title";
+                currentTitleEl.className = "card-title mb-0 bold";
                 currentTitleEl.textContent = data[0].name + " " + formatDate + " ";
                 var weatherIcon = document.createElement("img");
                 weatherIcon.src = "http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png";
@@ -118,7 +118,7 @@ var dynamicHistory = function(cityName) {
     var createCityButton = function(cityName) {
         var buttonEl = document.createElement("button");
         buttonEl.textContent = cityName;
-        buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.className = "btn btn-secondary btn-block btn-lg my-3";
         buttonEl.setAttribute("data-city", cityName);
         buttonEl.setAttribute("id", cityName.split(" ").join(""));
         searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
@@ -149,7 +149,7 @@ var loadHistory = function() {
     for (i = 0; i < savedHistory.length; i ++) {
         var buttonEl = document.createElement("button");
         buttonEl.textContent = savedHistory[i];
-        buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.className = "btn btn-secondary btn-block btn-lg my-3";
         buttonEl.setAttribute("data-city", savedHistory[i]);
         buttonEl.setAttribute("id", savedHistory[i].split(" ").join(""));
         searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
@@ -166,20 +166,20 @@ var currentWeather = function(response) {
     var createCurrentLiEl = function(condition){
         var listEl = document.createElement("li");
         listEl.textContent = condition;
-        listEl.className = "list-group-item";
+        listEl.className = "list-group-item border-0 font-size";
         currentConditionsEl.appendChild(listEl);
     }
     createCurrentLiEl("Temp: " + response.current.temp + "°C");
     createCurrentLiEl("Wind: " + response.current.wind_speed + " MPS");
     createCurrentLiEl("Humidity: " + response.current.humidity + "%");
     var listEl = document.createElement("li");
-    listEl.textContent = "UV Index: " + response.current.uvi;
-    if (response.current.uvi < 2) {
-        listEl.className = "list-group-item green";
-    } else if (response.current.uvi < 7) {
-        listEl.className = "list-group-item yellow";
-    } else if (response.current.uvi > 7) {
-        listEl.className = "list-group-item red";
+    listEl.className = "list-group-item border-0 font-size"
+    if (response.current.uvi <= 2) {
+        listEl.innerHTML = "UV Index: <span class='green'>" + response.current.uvi + "</span>";
+    } else if (response.current.uvi <= 7) {
+        listEl.innerHTML = "UV Index: <span class='yellow'>" + response.current.uvi + "</span>";
+    } else if (response.current.uvi > 8) {
+        listEl.innerHTML = "UV Index: <span class='red'>" + response.current.uvi + "</span>";
     }
     currentConditionsEl.appendChild(listEl);
 }
@@ -189,7 +189,7 @@ var forecastWeather = function(response) {
     for (i = 0; i < 5; i++) {
         //create a card div to hold forecast information for each day
         var cardEl = document.createElement("div");
-        cardEl.className = "card";
+        cardEl.className = "card p-3 border-0 my-3 sizing card-style";
         forecastWeatherEl.appendChild(cardEl);
         //add date title to each card
         var forecastTitle = document.createElement("h4");
@@ -199,18 +199,18 @@ var forecastWeather = function(response) {
         cardEl.appendChild(forecastTitle);
         //create a ul element to hold weather conditions
         var forecastConditions = document.createElement("ul");
-        forecastConditions.className = "list-group list-group-flush card-text";
+        forecastConditions.className = "list-group list-group-flush card-text card-style";
         cardEl.appendChild(forecastConditions);
         //function to create list elements out of weather conditions
         var createForecastLiEl = function(condition){
             var listEl = document.createElement("li");
             listEl.textContent = condition;
-            listEl.className = "list-group-item";
+            listEl.className = "list-group-item border-0 font-size card-style";
             forecastConditions.appendChild(listEl);
         }
         //add weather icon
         var listEl = document.createElement("li");
-        listEl.className = "list-group-item";
+        listEl.className = "list-group-item border-0 card-style";
         var weatherIcon = document.createElement("img");
         weatherIcon.src = "http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png";
         weatherIcon.alt = "weather icon";
