@@ -1,44 +1,37 @@
-//start basic structure using Boostrap grid
-//send API requests to get location, (date?), current weather, weather for the next five days
-
-//set up API request function
-    //send an initial request and parse with JSON to determine what values are returned by general request (and how to access)
-    //set up function to retrieve the hardcoded locations on the left (to practice how to retrieve, access, generate values and elements)
-    //link to buttons on the left
-    //set up function to dynamically retrieve weather data for user input using existing API request function (capture user input, trim text, add as API parameter)
-//set up function to generate elements for current weather (for loop)
-//set up function to loop through weather for next five days (add as a second parameter?)
 //set up buttons for search history using data-* property
-//set up ability for user input to be captured in form element and dynamically displayed
-//set up geolocation API from the openweather map software
 //set up function to choose from a list of icons depending on the type of weather returned
+//add momentJS to format dates
 //add finishing touches with Bootstrap/custom CSS
 
-//https://api.openweathermap.org/data/2.5/weather?q={city name}&appid=6b2366660c4d73ceba774993533fef58
-//https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid=6b2366660c4d73ceba774993533fef58
-//http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=6b2366660c4d73ceba774993533fef58
-
-var selectedCityEl = document.querySelector("#city-name")
-var submitButtonEl = document.querySelector("#submit-button")
+//add HTML elements
+var selectedCityEl = document.querySelector("#city-name");
+var searchFormEl = document.querySelector("#search-form");
+var submitButtonEl = document.querySelector("#submit-button");
 var currentTitleEl = document.querySelector("#current-title");
 var currentWeatherEl = document.querySelector("#current-weather");
-var forecastWeatherEl = document.querySelector("#forecast-weather")
+var forecastWeatherEl = document.querySelector("#forecast-weather");
+var searchHistoryEl = document.querySelector("#search-history");
 
+//on click, capture text value of form element
 var citySubmitHandler = function(event) {
     event.preventDefault();
-    currentWeatherEl.innerHTML = "";
-    forecastWeatherEl.innerHTML = "";
+    //trim input and send to geolocation API to get lat and lon values
     var cityName = selectedCityEl.value.trim();
     if (selectedCityEl.value) {
+        //reset divs on screen
+        selectedCityEl.value = "";
+        currentWeatherEl.innerHTML = "";
+        forecastWeatherEl.innerHTML = "";
         getLatLon(cityName);
     } else {
-        alert("Error: You need to enter a city")
+        alert("Error: You need to enter a city");
+        return;
     }
 }
 
 //geolocation API request
 var getLatLon = function(cityName) {
-    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "&appid=6b2366660c4d73ceba774993533fef58"; //don't forget to make city dynamic for user input
+    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "&appid=6b2366660c4d73ceba774993533fef58";
     fetch(apiUrl)
         .then(function(response) {
             if (response.ok) {
@@ -46,16 +39,16 @@ var getLatLon = function(cityName) {
                     if (data.length !== 0) {
                         getWeather(data);
                     } else {
-                        alert("Error: Invalid city")
+                        alert("Error: Invalid city");
                     }
                 })
             } else {
-                alert("Error: Unable to retrieve weather data")
+                alert("Error: Unable to retrieve weather data");
             }
         })
         .catch(function(error) {
-            alert("Unable to connect with Weather API")
-        })
+            alert("Unable to connect with Weather API");
+        });
 }
 
 //test API request
@@ -69,19 +62,81 @@ var getWeather = function(data) {
                 currentTitleEl.className = "card-title";
                 currentTitleEl.textContent = data[0].name + " " + response.current.dt + " " + response.current.weather[0].icon;
                 currentWeatherEl.appendChild(currentTitleEl);
-                //call two separate functions - one for current and one for future
+                //search for repeats, handle history buttons, load current weather, load weather forecast
+                searchRepeats(data[0].name);
+                dynamicHistory(data[0].name);
                 currentWeather(response);
                 forecastWeather(response);
             })
         } else {
-            alert("Error: Unable to retrieve weather data")
+            alert("Error: Unable to retrieve weather data");
         }
     })
     .catch(function(error) {
-        alert("Unable to connect with Weather API")
-    })
+        alert("Unable to connect with Weather API");
+    });
 }
 
+//set data attribute to be the text content of the button
+
+//search for repeats in search history
+var searchRepeats = function(cityName) {
+    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    for (var i = 0; i <= savedHistory.length; i++) {
+        if (savedHistory[i] === cityName) {
+            //remove repeated entry from saved history
+            savedHistory.splice(i, 1);
+            //remove repeated button
+            var buttonEl = document.querySelector("#" + cityName.split(" ").join(""));
+            buttonEl.remove();
+        }
+    }
+    localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+}
+
+var dynamicHistory = function(cityName) {
+    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    //function to create buttons
+    var createCityButton = function(cityName) {
+        var buttonEl = document.createElement("button");
+        buttonEl.textContent = cityName;
+        buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.setAttribute("id", cityName.split(" ").join(""));
+        searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
+    }
+    //limit update localStorage, but limit its length to 7 values - the eighth value is current location, create button
+    if (savedHistory.length === 7) {
+        savedHistory.shift();
+        savedHistory.push(cityName);
+        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        searchHistoryEl.removeChild(searchHistoryEl.lastChild);
+        createCityButton(cityName);
+    //update localStorage, create button
+    } else {
+        savedHistory.push(cityName);
+        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        createCityButton(cityName);
+    }
+}
+
+//load search history
+var loadHistory = function() {
+    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    //update localStorage if no entry currently exists
+    if (!savedHistory) {
+        savedHistory = [];
+        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+    }
+    for (i = 0; i < savedHistory.length; i ++) {
+        var buttonEl = document.createElement("button");
+        buttonEl.textContent = savedHistory[i];
+        buttonEl.className = "btn btn-secondary btn-block";
+        buttonEl.setAttribute("id", savedHistory[i].split(" ").join(""));
+        searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
+    }
+}
+
+//load current weather
 var currentWeather = function(response) {
     //create ul element to hold weather conditions
     var currentConditionsEl = document.createElement("ul");
@@ -89,7 +144,7 @@ var currentWeather = function(response) {
     currentWeatherEl.appendChild(currentConditionsEl);
     //function to create list elements
     var createCurrentLiEl = function(condition){
-        var listEl = document.createElement("li")
+        var listEl = document.createElement("li");
         listEl.textContent = condition;
         listEl.className = "list-group-item";
         currentConditionsEl.appendChild(listEl);
@@ -100,6 +155,7 @@ var currentWeather = function(response) {
     createCurrentLiEl("UV Index: " + response.current.uvi);
 }
 
+//load weather forecast
 var forecastWeather = function(response) {
     for (i = 0; i < 5; i++) {
         //create a card div to hold forecast information for each day
@@ -107,17 +163,17 @@ var forecastWeather = function(response) {
         cardEl.className = "card";
         forecastWeatherEl.appendChild(cardEl);
         //add date title to each card
-        var forecastTitle = document.createElement("h4")
-        forecastTitle.className = "card-title"
+        var forecastTitle = document.createElement("h4");
+        forecastTitle.className = "card-title";
         forecastTitle.textContent = response.daily[i].dt;
         cardEl.appendChild(forecastTitle);
         //create a ul element to hold weather conditions
-        var forecastConditions = document.createElement("ul")
-        forecastConditions.className = "list-group list-group-flush card-text"
+        var forecastConditions = document.createElement("ul");
+        forecastConditions.className = "list-group list-group-flush card-text";
         cardEl.appendChild(forecastConditions);
         //function to create list elements out of weather conditions
         var createForecastLiEl = function(condition){
-            var listEl = document.createElement("li")
+            var listEl = document.createElement("li");
             listEl.textContent = condition;
             listEl.className = "list-group-item";
             forecastConditions.appendChild(listEl);
@@ -129,6 +185,8 @@ var forecastWeather = function(response) {
     }
 }
 
+searchFormEl.addEventListener("submit", citySubmitHandler);
 submitButtonEl.addEventListener("click", citySubmitHandler);
 
+loadHistory();
 getLatLon("Toronto");
