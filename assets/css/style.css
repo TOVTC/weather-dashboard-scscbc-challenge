@@ -1,9 +1,14 @@
+* {
+    box-sizing: border-box;
+  }
+
 header {
     height: 100px;
     background: linear-gradient(90deg, rgb(112, 172, 197) 0%, rgb(34, 82, 128) 60%);
     color: rgb(255, 255, 255);
 }
 
+/*UV indicators*/
 .green {
     background: rgb(0, 128, 0);
     padding: 3px 10px;
@@ -22,24 +27,25 @@ header {
     border-radius: 10px;
 }
 
+/*custom CSS*/
+/*border for button history div*/
 .divider {
     border-top: 2px solid rgb(128, 128, 128);
 }
 
-.sizing {
-    max-width: 225px;
-    min-width: 175px;
-}
-
+/*bold font*/
 .bold {
     font-weight: bold;
 }
 
+/*current and forecast condition font size*/
 .font-size {
     font-size: 18px;
 }
 
+/*card styling*/
 .card-style {
+    min-width: 150px;
     color: rgb(255, 255, 255);
     background: rgb(112, 172, 197);
 }

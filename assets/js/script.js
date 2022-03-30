@@ -1,7 +1,3 @@
-//set up function to choose from a list of icons depending on the type of weather returned
-//add momentJS to format dates
-//add finishing touches with Bootstrap/custom CSS
-
 //add HTML elements
 var selectedCityEl = document.querySelector("#city-name");
 var searchFormEl = document.querySelector("#search-form");
@@ -10,6 +6,9 @@ var currentTitleEl = document.querySelector("#current-title");
 var currentWeatherEl = document.querySelector("#current-weather");
 var forecastWeatherEl = document.querySelector("#forecast-weather");
 var searchHistoryEl = document.querySelector("#search-history");
+
+//universal button class
+var buttonClass = "btn btn-secondary btn-block btn-lg my-3"
 
 //on click, capture text value of form element
 var citySubmitHandler = function(event) {
@@ -30,7 +29,7 @@ var citySubmitHandler = function(event) {
 
 //button for saved city clicked
 var clickHandler = function(event) {
-    if (event.target.className === "btn btn-secondary btn-block btn-lg my-3") {
+    if (event.target.className === buttonClass) {
         //reset divs 
         currentWeatherEl.innerHTML = "";
         forecastWeatherEl.innerHTML = "";
@@ -75,13 +74,8 @@ var getWeather = function(data) {
                 var formatDate = moment.unix(response.current.dt).format("(YYYY/MM/DD)");
                 var currentTitleEl = document.createElement("h2");
                 currentTitleEl.className = "card-title mb-0 bold";
-                currentTitleEl.textContent = data[0].name + " " + formatDate + " ";
-                var weatherIcon = document.createElement("img");
-                weatherIcon.src = "http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png";
-                weatherIcon.alt = "weather icon";
-                currentTitleEl.appendChild(weatherIcon);
+                currentTitleEl.innerHTML = data[0].name+ " " + formatDate + " " + "<img src='http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png' alt='weather icon'/>";
                 currentWeatherEl.appendChild(currentTitleEl);
-                //search for repeats, handle history buttons, load current weather, load weather forecast
                 searchRepeats(data[0].name);
                 dynamicHistory(data[0].name);
                 currentWeather(response);
@@ -111,29 +105,35 @@ var searchRepeats = function(cityName) {
     localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
 }
 
+//upload searches to localStorage
+var uploadSearch = function(savedHistory) {
+    localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+}
+
+//function to create buttons
+var createCityButton = function(cityName) {
+    var buttonEl = document.createElement("button");
+    buttonEl.textContent = cityName;
+    buttonEl.className = buttonClass;
+    buttonEl.setAttribute("data-city", cityName);
+    buttonEl.setAttribute("id", cityName.split(" ").join(""));
+    searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
+}
+
 //handles button creation and localStorage updates - avoids repeats and sets a max length for search history
 var dynamicHistory = function(cityName) {
     var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
-    //function to create buttons
-    var createCityButton = function(cityName) {
-        var buttonEl = document.createElement("button");
-        buttonEl.textContent = cityName;
-        buttonEl.className = "btn btn-secondary btn-block btn-lg my-3";
-        buttonEl.setAttribute("data-city", cityName);
-        buttonEl.setAttribute("id", cityName.split(" ").join(""));
-        searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
-    }
     //limit update localStorage, but limit its length to 7 values - the eighth value is current location, create button
     if (savedHistory.length === 8) {
         savedHistory.shift();
         savedHistory.push(cityName);
-        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        uploadSearch(savedHistory);
         searchHistoryEl.removeChild(searchHistoryEl.lastChild);
         createCityButton(cityName);
     //update localStorage, create button
     } else {
         savedHistory.push(cityName);
-        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        uploadSearch(savedHistory);
         createCityButton(cityName);
     }
 }
@@ -144,15 +144,11 @@ var loadHistory = function() {
     //update localStorage if no entry currently exists
     if (!savedHistory) {
         savedHistory = [];
-        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        uploadSearch(savedHistory);
     }
+    //create buttons from localStorage
     for (i = 0; i < savedHistory.length; i ++) {
-        var buttonEl = document.createElement("button");
-        buttonEl.textContent = savedHistory[i];
-        buttonEl.className = "btn btn-secondary btn-block btn-lg my-3";
-        buttonEl.setAttribute("data-city", savedHistory[i]);
-        buttonEl.setAttribute("id", savedHistory[i].split(" ").join(""));
-        searchHistoryEl.insertBefore(buttonEl, searchHistoryEl.firstChild);
+        createCityButton(savedHistory[i]);
     }
 }
 
@@ -165,23 +161,22 @@ var currentWeather = function(response) {
     //function to create list elements
     var createCurrentLiEl = function(condition){
         var listEl = document.createElement("li");
-        listEl.textContent = condition;
+        listEl.innerHTML = condition;
         listEl.className = "list-group-item border-0 font-size";
         currentConditionsEl.appendChild(listEl);
     }
+    //create list elements for current weather conditions
     createCurrentLiEl("Temp: " + response.current.temp + "°C");
     createCurrentLiEl("Wind: " + response.current.wind_speed + " MPS");
     createCurrentLiEl("Humidity: " + response.current.humidity + "%");
-    var listEl = document.createElement("li");
-    listEl.className = "list-group-item border-0 font-size"
+    //create dynamic UV element
     if (response.current.uvi <= 2) {
-        listEl.innerHTML = "UV Index: <span class='green'>" + response.current.uvi + "</span>";
+        createCurrentLiEl("UV Index: <span class='green'>" + response.current.uvi + "</span>");
     } else if (response.current.uvi <= 7) {
-        listEl.innerHTML = "UV Index: <span class='yellow'>" + response.current.uvi + "</span>";
+        createCurrentLiEl("UV Index: <span class='yellow'>" + response.current.uvi + "</span>");
     } else if (response.current.uvi > 8) {
-        listEl.innerHTML = "UV Index: <span class='red'>" + response.current.uvi + "</span>";
+        createCurrentLiEl("UV Index: <span class='red'>" + response.current.uvi + "</span>");
     }
-    currentConditionsEl.appendChild(listEl);
 }
 
 //load weather forecast
@@ -189,7 +184,7 @@ var forecastWeather = function(response) {
     for (i = 0; i < 5; i++) {
         //create a card div to hold forecast information for each day
         var cardEl = document.createElement("div");
-        cardEl.className = "card p-3 border-0 my-3 sizing card-style";
+        cardEl.className = "card p-3 border-0 m-3 card-style";
         forecastWeatherEl.appendChild(cardEl);
         //add date title to each card
         var forecastTitle = document.createElement("h4");
@@ -204,19 +199,12 @@ var forecastWeather = function(response) {
         //function to create list elements out of weather conditions
         var createForecastLiEl = function(condition){
             var listEl = document.createElement("li");
-            listEl.textContent = condition;
+            listEl.innerHTML = condition;
             listEl.className = "list-group-item border-0 font-size card-style";
             forecastConditions.appendChild(listEl);
         }
-        //add weather icon
-        var listEl = document.createElement("li");
-        listEl.className = "list-group-item border-0 card-style";
-        var weatherIcon = document.createElement("img");
-        weatherIcon.src = "http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png";
-        weatherIcon.alt = "weather icon";
-        listEl.appendChild(weatherIcon);
-        forecastConditions.appendChild(listEl);
-        //create remaining weather elements
+        //create list elements
+        createForecastLiEl("<img src='http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png' alt='weather icon'/>");
         createForecastLiEl("Temp: " + response.daily[i].temp.day + "°C");
         createForecastLiEl("Wind: " + response.daily[i].wind_speed + " MPS");
         createForecastLiEl("Humidity: " + response.daily[i].humidity + "%");
