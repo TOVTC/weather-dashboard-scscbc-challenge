@@ -191,7 +191,7 @@ var currentWeather = function(response) {
 
 //load weather forecast
 var forecastWeather = function(response) {
-    for (i = 0; i < 5; i++) {
+    for (i = 1; i < 6; i++) {
         //create a card div to hold forecast information for each day
         var cardEl = document.createElement("div");
         cardEl.className = "card p-3 border-0 m-3 card-style";
