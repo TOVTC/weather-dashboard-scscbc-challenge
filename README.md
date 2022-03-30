@@ -30,7 +30,7 @@ MIT License
 ## Project status
 Submitted 2022Mar30</br>
 
-## Assignment Information - Web APIs Challenge: Code Quiz
+## Assignment Information - Server-Side APIs Challenge: Weather Dashboard
 ### User Story
 AS A traveler</br>
 I WANT to see the weather outlook for multiple cities</br>
