@@ -229,9 +229,15 @@ var resetHistory = function(){
     if (reset) {
         var savedHistory = [];
         localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
-        var defaultCity = localStorage.getItem("defaultCity");
-        searchHistoryEl.innerHTML = "";
-        getLatLon(defaultCity);
+        var defaultCity = JSON.parse(localStorage.getItem("defaultCity"));
+        if (!defaultCity || defaultCity.length === 0) {
+            defaultCity = [];
+            localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
+            getLatLon("Toronto");
+        } else {
+            searchHistoryEl.innerHTML = "";
+            getLatLon(defaultCity);
+        }
     } else {
         return;
     }
@@ -255,9 +261,9 @@ var setDefault = function() {
 var pageLoad = function() {
     var defaultCity = JSON.parse(localStorage.getItem("defaultCity"));
     if (!defaultCity || defaultCity.length === 0) {
-        defaultCity = ["Toronto"];
+        defaultCity = [];
         localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
-        getLatLon(defaultCity);
+        getLatLon("Toronto");
     } else {
         getLatLon(defaultCity);
     }
