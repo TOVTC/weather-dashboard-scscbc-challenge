@@ -8,7 +8,13 @@ var forecastWeatherEl = document.querySelector("#forecast-weather");
 var searchHistoryEl = document.querySelector("#search-history");
 
 //universal button class
-var buttonClass = "btn btn-secondary btn-block btn-lg my-3"
+var buttonClass = "btn btn-secondary btn-block btn-lg my-3";
+
+//reset divs
+var resetDivs = function() {
+    currentWeatherEl.innerHTML = "";
+    forecastWeatherEl.innerHTML = "";
+}
 
 //on click, capture text value of form element
 var citySubmitHandler = function(event) {
@@ -16,10 +22,8 @@ var citySubmitHandler = function(event) {
     //trim input and send to geolocation API to get lat and lon values
     var cityName = selectedCityEl.value.trim();
     if (selectedCityEl.value) {
-        //reset divs
+        //reset form
         selectedCityEl.value = "";
-        currentWeatherEl.innerHTML = "";
-        forecastWeatherEl.innerHTML = "";
         getLatLon(cityName);
     } else {
         alert("Error: You need to enter a city");
@@ -30,9 +34,6 @@ var citySubmitHandler = function(event) {
 //button for saved city clicked
 var clickHandler = function(event) {
     if (event.target.className === buttonClass) {
-        //reset divs 
-        currentWeatherEl.innerHTML = "";
-        forecastWeatherEl.innerHTML = "";
         //get data attribute, set as cityName
         var cityName = event.target.getAttribute("data-city");
         getLatLon(cityName);
@@ -70,12 +71,15 @@ var getWeather = function(data) {
     fetch(apiUrl).then(function(response) {
         if (response.ok) {
             response.json().then(function(response) {
+                //reset divs
+                resetDivs();
                 //add header text
                 var formatDate = moment.unix(response.current.dt).format("(YYYY/MM/DD)");
                 var currentTitleEl = document.createElement("h2");
                 currentTitleEl.className = "card-title mb-0 bold";
-                currentTitleEl.innerHTML = data[0].name+ " " + formatDate + " " + "<img src='http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png' alt='weather icon'/>";
+                currentTitleEl.innerHTML = data[0].name + " " + formatDate + " " + "<img src='http://openweathermap.org/img/wn/" + response.current.weather[0].icon + "@2x.png' alt='weather icon'/>";
                 currentWeatherEl.appendChild(currentTitleEl);
+                //handle repeat and new searches, display current and forecast weather
                 searchRepeats(data[0].name);
                 dynamicHistory(data[0].name);
                 currentWeather(response);
@@ -90,9 +94,20 @@ var getWeather = function(data) {
     });
 }
 
+//upload searches to localStorage
+var uploadSearch = function(savedHistory) {
+    localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+}
+
+//download searches from localStorage
+var downloadSearch = function() {
+    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    return savedHistory;
+}
+
 //search for repeats in search history
 var searchRepeats = function(cityName) {
-    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    var savedHistory = downloadSearch();
     for (var i = 0; i <= savedHistory.length; i++) {
         if (savedHistory[i] === cityName) {
             //remove repeated entry from saved history
@@ -102,12 +117,7 @@ var searchRepeats = function(cityName) {
             buttonEl.remove();
         }
     }
-    localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
-}
-
-//upload searches to localStorage
-var uploadSearch = function(savedHistory) {
-    localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+    uploadSearch(savedHistory);
 }
 
 //function to create buttons
@@ -122,7 +132,7 @@ var createCityButton = function(cityName) {
 
 //handles button creation and localStorage updates - avoids repeats and sets a max length for search history
 var dynamicHistory = function(cityName) {
-    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    var savedHistory = downloadSearch();
     //limit update localStorage, but limit its length to 7 values - the eighth value is current location, create button
     if (savedHistory.length === 8) {
         savedHistory.shift();
@@ -140,7 +150,7 @@ var dynamicHistory = function(cityName) {
 
 //load search history
 var loadHistory = function() {
-    var savedHistory = JSON.parse(localStorage.getItem("savedHistory"));
+    var savedHistory = downloadSearch();
     //update localStorage if no entry currently exists
     if (!savedHistory) {
         savedHistory = [];
