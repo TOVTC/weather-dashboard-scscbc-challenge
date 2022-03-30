@@ -6,6 +6,8 @@ var currentTitleEl = document.querySelector("#current-title");
 var currentWeatherEl = document.querySelector("#current-weather");
 var forecastWeatherEl = document.querySelector("#forecast-weather");
 var searchHistoryEl = document.querySelector("#search-history");
+var resetHistoryEl = document.querySelector("#clear-history");
+var setDefaultEl = document.querySelector("#set-default");
 
 //universal button class
 var buttonClass = "btn btn-secondary btn-block btn-lg my-3";
@@ -221,9 +223,48 @@ var forecastWeather = function(response) {
     }
 }
 
+var resetHistory = function(){
+    var reset = confirm("This will clear search history and set 'Toronto' as the default city. Proceed?");
+    if (reset) {
+        var savedHistory = [];
+        localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
+        var defaultCity = [];
+        localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
+        searchHistoryEl.innerHTML = "";
+        getLatLon("Toronto");
+    } else {
+        return;
+    }
+}
+
+var setDefault = function() {
+    var savedHistory = downloadSearch();
+    var defaultCity = savedHistory.slice(-1);
+    var automatic = confirm("Set your most recent search (" + defaultCity + ") to automatically display on future page loads?");
+    if (automatic) {
+        var savedHistory = downloadSearch();
+        var defaultCity = savedHistory.slice(-1);
+        localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
+    } else {
+        return;
+    }
+}
+
+var pageLoad = function() {
+    var defaultCity = JSON.parse(localStorage.getItem("defaultCity"));
+    if (!defaultCity || defaultCity.length === 0) {
+        defaultCity = [];
+        localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
+        getLatLon("Toronto");
+    } else {
+        getLatLon(defaultCity);
+    }
+}
+
 searchFormEl.addEventListener("submit", citySubmitHandler);
-submitButtonEl.addEventListener("click", citySubmitHandler);
 searchHistoryEl.addEventListener("click", clickHandler);
+resetHistoryEl.addEventListener("click", resetHistory);
+setDefaultEl.addEventListener("click", setDefault);
 
 loadHistory();
-getLatLon("Toronto");
+pageLoad();
