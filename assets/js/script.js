@@ -179,7 +179,7 @@ var currentWeather = function(response) {
     }
     //create list elements for current weather conditions
     createCurrentLiEl("Temp: " + response.current.temp + "°C");
-    createCurrentLiEl("Wind: " + response.current.wind_speed + " MPS");
+    createCurrentLiEl("Wind: " + response.current.wind_speed + " m/s");
     createCurrentLiEl("Humidity: " + response.current.humidity + "%");
     //create dynamic UV element
     if (response.current.uvi <= 2) {
@@ -218,7 +218,7 @@ var forecastWeather = function(response) {
         //create list elements
         createForecastLiEl("<img src='http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png' alt='weather icon'/>");
         createForecastLiEl("Temp: " + response.daily[i].temp.day + "°C");
-        createForecastLiEl("Wind: " + response.daily[i].wind_speed + " MPS");
+        createForecastLiEl("Wind: " + response.daily[i].wind_speed + " m/s");
         createForecastLiEl("Humidity: " + response.daily[i].humidity + "%");
     }
 }
