@@ -223,20 +223,21 @@ var forecastWeather = function(response) {
     }
 }
 
+//reset search history
 var resetHistory = function(){
-    var reset = confirm("This will clear search history and set 'Toronto' as the default city. Proceed?");
+    var reset = confirm("Search history will be cleared. This action cannot be undone. Proceed?");
     if (reset) {
         var savedHistory = [];
         localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
-        var defaultCity = [];
-        localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
+        var defaultCity = localStorage.getItem("defaultCity");
         searchHistoryEl.innerHTML = "";
-        getLatLon("Toronto");
+        getLatLon(defaultCity);
     } else {
         return;
     }
 }
 
+//set default city displayed on page load
 var setDefault = function() {
     var savedHistory = downloadSearch();
     var defaultCity = savedHistory.slice(-1);
@@ -250,12 +251,13 @@ var setDefault = function() {
     }
 }
 
+//load default city on page load, otherwise load Toronto if no default city has been set
 var pageLoad = function() {
     var defaultCity = JSON.parse(localStorage.getItem("defaultCity"));
     if (!defaultCity || defaultCity.length === 0) {
-        defaultCity = [];
+        defaultCity = ["Toronto"];
         localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
-        getLatLon("Toronto");
+        getLatLon(defaultCity);
     } else {
         getLatLon(defaultCity);
     }
