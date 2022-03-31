@@ -225,7 +225,7 @@ var forecastWeather = function(response) {
 
 //reset search history
 var resetHistory = function(){
-    var reset = confirm("Search history will be cleared. This action cannot be undone. Proceed?");
+    var reset = confirm("Clear search history and load default city?");
     if (reset) {
         var savedHistory = [];
         localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
