@@ -231,9 +231,10 @@ var resetHistory = function(){
         localStorage.setItem("savedHistory", JSON.stringify(savedHistory));
         var defaultCity = JSON.parse(localStorage.getItem("defaultCity"));
         if (!defaultCity || defaultCity.length === 0) {
-            defaultCity = [];
+            defaultCity = ["Toronto"];
             localStorage.setItem("defaultCity", JSON.stringify(defaultCity));
-            getLatLon("Toronto");
+            searchHistoryEl.innerHTML = "";
+            getLatLon(defaultCity);
         } else {
             searchHistoryEl.innerHTML = "";
             getLatLon(defaultCity);
