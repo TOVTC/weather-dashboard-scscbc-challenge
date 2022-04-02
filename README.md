@@ -5,7 +5,7 @@ This website provides current and forecast weather conditions.
 This website hosts a weather dashboard. Users can search by city to find the current and forecast weather for the next five days. Search history for the past eight queries is dynamically and non-repetitively displayed in the left column, with more recent searches displayed at the top. Users can click on search history entries to be shown updated weather information for that location.
 
 ### Bonus Features
-Users can set their most recent search as the default city displayed on page load or they can reset searcg history at the click of a button! 
+Users can set their most recent search as the default city displayed on page load or they can reset search history at the click of a button! 
 
 ## Website
 [Weather-Dashboard-Challenge-6](https://tovtc.github.io/weather-dashboard-scscbc-challenge/)
@@ -16,7 +16,7 @@ Users can set their most recent search as the default city displayed on page loa
 * HTML
 * CSS
 * JavaScript
-* Momentjs
+* Moment.js
 * OpenWeatherMap API
 * Bootstrap
 
